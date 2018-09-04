@@ -1,0 +1,24 @@
+{
+  "name": "child-process-api",
+  "version": "1.0.0",
+  "description": "test child_process API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmk1111/child-process-api.git"
+  },
+  "author": "Dmytro Holysh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dmk1111/child-process-api/issues"
+  },
+  "homepage": "https://github.com/dmk1111/child-process-api#readme",
+  "dependencies": {
+    "angular": "^1.7.2",
+    "express": "^4.16.3",
+    "redis": "^2.8.0"
+  }
+}
