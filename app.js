@@ -1,8 +1,7 @@
 const express = require('express');
 const app = express();
-const fs = require('fs');
-const CSV = require("csvtojson");
 const bodyParser = require('body-parser');
+const { fork } = require('child_process');
 
 const pseudoDb = new Map();
 
@@ -14,19 +13,14 @@ app.get('/status/:id', (req, res) => {
     let id = +req.params.id;
     let data = pseudoDb.get(id);
     console.log(id);
-    console.log(data);
-    res.send({message: {inProgress: data}});
+    res.send({ message: data });
 });
 app.post('/upload', function (req, res) {
     let name = req.body.name;
     if (!_isCSV(name)) {
         return res.status(503).send("File should have .csv extension");
     }
-    let data = new Buffer(req.body.data, 'binary');
-    let filePath = `./temp/${name}`;
-    fs.appendFileSync(filePath, ''); // create file if it doesn't exist
-    fs.writeFileSync(filePath, data);
-    _parseCSV(filePath);
+    convertCsvToJson(req.body.data, name);
     res.status(202).send({ message: 'Accepted', id: lastId });
     lastId += 1;
 });
@@ -34,33 +28,27 @@ app.use(express.static(__dirname));
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
-function _parseCSV(path) {
-    return new Promise((resolve, reject) => {
-        let arr = [];
-        CSV()
-            .fromFile(path)
-            .preFileLine((fileLineString, lineIdx) => {
-                pseudoDb.set(12345, { inProgress: true, line: lineIdx });
-                console.log(pseudoDb.get(12345));
-                console.log(fileLineString);
-                return fileLineString;
-            })
-            .subscribe((jsonObj)=>{
-                arr.push(jsonObj);
-            })
-            .on('done', (error) => {
-                if (error) {
-                    return reject(error);
-                }
-                pseudoDb.set(12345, { inProgress: false, data: arr });
-                console.log(pseudoDb.get(12345));
-                resolve(JSON.stringify(arr));
-                console.log(arr);
-            })
-    })
-}
-
 function _isCSV(path) {
     let csvTest = new RegExp(".*\\.csv", "gi");
     return csvTest.test(path);
+}
+
+function convertCsvToJson(binaryData, name) {
+    let forkedProcess = fork('./csvParser.js');
+    forkedProcess.send({ data: binaryData, name });
+    forkedProcess.on('message', ({ data, line, error }) => {
+        if (line) {
+            pseudoDb.set(12345, { inProgress: true, line: line });
+        } else if (data) {
+            console.log('finished');
+            pseudoDb.set(12345, { inProgress: false, data: data });
+        } else if (error) {
+            console.log(error);
+            pseudoDb.set(12345, { inProgress: false, error: error });
+        }
+    });
+    forkedProcess.on('exit', function (code, signal) {
+        console.log('child process exited with ' +
+            `code ${code} and signal ${signal}`);
+    });
 }

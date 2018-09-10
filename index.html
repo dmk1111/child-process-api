@@ -13,7 +13,12 @@
 <form>
     Select a CSV file to upload (50mb max):
     <input type="file" id="file" name="file">
+    <br>
     <button ng-click="add()">Upload file</button>
+    <br>
+    <button ng-click="statusCheck()">Check convertion status</button>
+    <p ng-if="status && !status.data && !status.error">Status: in progress - {{status.inProgress}}; line - {{status.line}}</p>
+    <p ng-if="status && status.data">Status: finished</p>
 </form>
 </body>
 </html>
