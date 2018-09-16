@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" ng-app="fileUploadApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./node_modules/angular/angular.js"></script>
+    <script src="./script.js"></script>
+</head>
+<body ng-controller="uploadCtrl">
+<form>
+    Select a CSV file to upload (50mb max):
+    <input type="file" id="file" name="file">
+    <br>
+    <button ng-click="add()">Upload file</button>
+    <br>
+    <button ng-click="statusCheck()">Check convertion status</button>
+    <p ng-if="status && !status.data && !status.error">Status: in progress - {{status.inProgress}}; line - {{status.line}}</p>
+    <p ng-if="status && status.data">Status: finished</p>
+</form>
+</body>
+</html>
