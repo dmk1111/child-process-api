@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/dmk1111/child-process-api#readme",
   "dependencies": {
-    "angular": "^1.7.2",
+    "angular": "^1.8.0",
     "csvtojson": "^2.0.8",
     "express": "^4.16.3"
   }
